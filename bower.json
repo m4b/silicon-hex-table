@@ -16,7 +16,7 @@
         "polymer"
     ],
   "main": "silicon-hex-table.html",
-  "license": "LICENSE.txt",
+  "license": "LICENSE",
   "homepage": "https://github.com/m4b/silicon-hex-table/",
   "ignore": [
     "/.*",
