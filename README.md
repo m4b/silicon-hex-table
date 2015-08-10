@@ -14,4 +14,4 @@ Example:
 
 For more details, head on over to the [documentation page](http://m4b.github.io/silicon-hex-table).
 
-And remember: always hex responsibly.
+And remember: **_always hex responsibly_**.
