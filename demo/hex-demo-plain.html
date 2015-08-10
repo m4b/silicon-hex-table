@@ -7,13 +7,10 @@
 
    :host {
      padding: 16px;
-     line-height: 1.0;
    }
 
    div {
      padding: 16px;
-     margin: 0 auto;
-     text-align: center;
    }
 
    span {
@@ -24,17 +21,6 @@
      display: inline-block;
      padding: 4px;
    }
-
-   silicon-hex-table {
-     margin-top: 16px;
-     --ascii-color: red;
-     --highlight-color: blue;
-     --hex-color: grey;
-     --header-color: darkgrey;
-     --background-color: black;
-     --font-size: 18px;
-   }
-   
   </style>
   <template>
 
@@ -43,9 +29,8 @@
     <div>
       <span>Offset</span><input value="{{offset::input}}"/>
       <span>Rows</span><input value="{{_rows::input}}"/>
-      <silicon-hex-table rows="[[_rows]]" offset="[[_offset]]" bytes="[[ls]]"></silicon-hex-table>
     </div>
-      
+        <silicon-hex-table rows="[[_rows]]" offset="[[_offset]]" bytes="[[ls]]"></silicon-hex-table>
   </template>
 
   <script>

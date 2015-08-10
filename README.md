@@ -12,6 +12,6 @@ Example:
 <silicon-hex-table offset="[[offset]]" bytes="[[bytes]]"></silicon-hex-table>
 ````
 
-For more details, head on over to the [documentation page](http://m4b.github.io/silicon-hex-table).
+For more details and a demo, head on over to the [documentation page](http://m4b.github.io/silicon-hex-table).
 
 And remember: **_always hex responsibly_**.
