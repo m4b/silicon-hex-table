@@ -1,3 +1,7 @@
+# Install
+
+`bower install silicon-hex-table`
+
 # Usage
 
 `<silicon-hex-table>` accepts an optional `offset` and a `Uint8Array` called `bytes`, and then displays the results, as all hexadecimal editors/viewers should.
