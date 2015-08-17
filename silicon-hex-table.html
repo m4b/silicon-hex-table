@@ -143,7 +143,8 @@ Custom property | Description | Default
             value: function() {
               return {
                 row: 0,
-                col: 0
+                col: 0,
+                offset: 0
               }
             }
           },
@@ -219,6 +220,7 @@ Custom property | Description | Default
         /**
          * The `highlight-changed` event is fired whenever `highlighted` is changed.
          *
+         * {{row: Number, col: Number, offset: Number}}
          * @event highlight-changed
          */
 
@@ -334,8 +336,8 @@ Custom property | Description | Default
         _highlightAscii: function(highlight, e) {
           var id = e.target.id;
           var split = id.slice(1).split('c');
-          var r = split[0];
-          var c = split[1];
+          var r = parseInt(split[0]);
+          var c = parseInt(split[1]);
           var ascii = '#asciir';
           var hex = '#r';
           var selector = ascii + r + 'c' + c;
@@ -344,8 +346,9 @@ Custom property | Description | Default
             Polymer.dom(ascii).classList.add('highlighted');
             e.target.classList.add('highlighted');
             this.set('highlight', {
-              r: r,
-              c: c
+              row: r,
+              col: c,
+              offset: this.offset + (c + (r * this.rows))
             });
           } else {
             Polymer.dom(ascii).classList.remove('highlighted');
