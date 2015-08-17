@@ -34,60 +34,62 @@ Custom property | Description | Default
 @demo
 -->
 <dom-module id="silicon-hex-table">
-  <style>
-    :host {
-      display: block;
-      --highlight-color: #f0f3a9;
-      --ascii-color: blue;
-      --hex-color: #333;
-      --header-color: #ccc;
-      --background-color: #fafafa;
-      --offset-color: #bd8d00;
-      --font-size: 16px;
-      font-size: var(--font-size);
-      font-family: 'Inconsolata', monospace;
-    }
+<style>
+  :host {
+    display: block;
+    --highlight-color: #f0f3a9;
+    --ascii-color: blue;
+    --hex-color: #333;
+    --column-padding: 4px;
+    --inner-column-padding: 2px;
+    --header-color: #ccc;
+    --background-color: #fafafa;
+    --offset-color: #bd8d00;
+    --font-size: 16px;
+    font-size: var(--font-size);
+    font-family: 'Inconsolata', monospace;
+  }
 
-    table {
-      display: inline-block;
-      background: var(--background-color);
-      color: var(--hex-color);
-      border: 0px;
-      border-collapse: collapse;
-      border-spacing: 0px 0px;
-    }
+  #table {
+    display: inline-block;
+    background: var(--background-color);
+    color: var(--hex-color);
+    border: 0px;
+    border-collapse: collapse;
+    border-spacing: 0px 0px;
+  }
 
-    td,
-    th {
-      border: 0px;
-      margin: 0px;
-      padding-right: 16px;
-      font-weight: normal;
-    }
+  td,
+  th {
+    border: 0px;
+    margin: 0px;
+    padding-right: var(--column-padding);
+    font-weight: normal;
+  }
 
-    .header {
-      background: var(--header-color);
-    }
+  .header {
+    background: var(--header-color);
+  }
 
-    .hex, .hexheader {
-      padding: 0 4px;
-    }
+  .hex,
+  .hexheader {
+    padding: 0 var(--inner-column-padding);
+  }
 
-    .ascii {
-      color: var(--ascii-color);
-    }
+  .ascii {
+    color: var(--ascii-color);
+  }
 
-    .highlighted {
-      background-color: var(--highlight-color);
-    }
+  .highlighted {
+    background-color: var(--highlight-color);
+  }
 
-    .offsets {
-      color: var(--offset-color);
-    }
+  .offsets {
+    color: var(--offset-color);
+  }
   </style>
   <template>
-
-    <table>
+    <table id="table">
       <tr class="header">
         <th>
           <span>87654321</span>
@@ -97,7 +99,7 @@ Custom property | Description | Default
         </th>
         <th>
           <!-- because http://stackoverflow.com/questions/31846667/dom-repeat-with-span-whitespace-solution -->
-        <template is="dom-repeat" items="[[_asciiheader]]"><span>[[item]]</span></template>
+          <template is="dom-repeat" items="[[_asciiheader]]"><span>[[item]]</span></template>
         </th>
       </tr>
 
@@ -109,7 +111,7 @@ Custom property | Description | Default
           <td class="bytes">
             <template is="dom-repeat" items="[[_get(row)]]" as="col"><span id$="[[col.id]]" class="hex">[[_getHex(_bytes, offset, col)]]</span></template>
           </td>
-          <td>
+          <td class="asciiheader">
             <template is="dom-repeat" items="[[_get(row)]]" as="col"><span id$="[[col.hid]]" class="ascii">[[_getAscii(_bytes, offset, col)]]</span></template>
           </td>
         </tr>
@@ -125,16 +127,16 @@ Custom property | Description | Default
 
         properties: {
           /**
-           * The bytes to display in the table.  
+           * The bytes to display in the table.
            * **NOTE**: must be a `Uint8Array`.
-          */
+           */
           bytes: {
             type: Array
           },
           /**
-             * The currently highlighted row and column in the table.
-             * If you want to track the highlighted byte, listen to this event.
-          */
+           * The currently highlighted row and column in the table.
+           * If you want to track the highlighted byte, listen to this event.
+           */
           highlight: {
             type: Object,
             notify: true,
@@ -148,15 +150,15 @@ Custom property | Description | Default
           /**
            * The offset into `bytes`.
            * If you modify this value, the hex table recomputes the various tables accordingly.
-          */
+           */
           offset: {
             type: Number,
             value: 0x0
           },
           /**
-           * The number of columns to display.  
+           * The number of columns to display.
            * This is `readOnly` for now.
-          */
+           */
           columns: {
             type: Number,
             readOnly: true,
@@ -165,7 +167,7 @@ Custom property | Description | Default
           /**
            * The number of rows to display, zero-indexed.
            * If you modify this value, the table is recalculated (this is relatively expensive, don't do this so much).
-          */
+           */
           rows: {
             type: Number,
             value: 19
@@ -173,14 +175,14 @@ Custom property | Description | Default
           /**
            * The computed property for the bytes to display.
            * Used instead of `bytes` in case we allow base64 encoded strings in addition to Uint8Array in a future release.
-          */
+           */
           _bytes: {
             computed: '_computeBytes(bytes)'
           },
           /**
            * Emacs `hexl-mode` style ascii row header display.  In the future we'll let this be customizable.
            *
-          */
+           */
           _asciiheader: {
             type: Array,
             value: function() {
@@ -192,7 +194,7 @@ Custom property | Description | Default
           /**
            * Emacs `hexl-mode` style hex row header display.  In the future we'll let this be customizable.
            *
-          */
+           */
           _header: {
             type: Array,
             value: function() {
@@ -204,7 +206,7 @@ Custom property | Description | Default
           /**
            * The table we compute when the rows change.
            *
-          */
+           */
           _table: {
             type: Array,
             computed: '_computeTable(rows)',
@@ -219,16 +221,17 @@ Custom property | Description | Default
          *
          * @event highlight-changed
          */
-        
+
         /**
          * Computed function for `_bytes`; currently just checks if `bytes` attribute is a Uint8Array, and if not, educates the user and returns an empty `Uint8Array`.
          * @param {Uint8Array} bytes The bytes to view
          * @return {Uint8Array} The actual internal representation we use
          */
-        _computeBytes: function(bytes){
-          
-          if (bytes instanceof Uint8Array){ return bytes;}
-          else {
+        _computeBytes: function(bytes) {
+
+          if (bytes instanceof Uint8Array) {
+            return bytes;
+          } else {
             console.log('Error: <silicon-hex-table> requires Uint8Array of bytes');
             return new Uint8Array(0);
           }
@@ -241,14 +244,14 @@ Custom property | Description | Default
          * @param {Uint8Array} offset The current offset that's been set
          * @param {Uint8Array} index The offset row we're displaying
          * @return {string} The pretty-printed hexadecimal offset for the row of the bytes we're viewing
-         */        
+         */
         _getOffset: function(offset, index) {
           // if (offset < 0) return ' ';
           var offsetstr = (offset + (index * this.columns)).toString(16);
           var len = offsetstr.length;
           var pad = '';
           for (var i = 0; i < (8 - len); i++) {
-              pad += '0';
+            pad += '0';
           }
           return pad + offsetstr;
         },
@@ -284,7 +287,7 @@ Custom property | Description | Default
          * @param {number} offset The current offset into the byte array
          * @param {object} raster The raster object from the `_table` computed property with row and column index
          * @return {string} The hexadecimal string value of the byte in the table, padded with a 0 if necessary
-         */        
+         */
         _getHex: function(bytes, offset, raster) {
           var i = this._raster2index(offset, raster.r, raster.c);
           if (i >= bytes.length || i < 0) {
@@ -350,10 +353,11 @@ Custom property | Description | Default
           }
         },
 
-        _initHighlighting: function(){
+        _initHighlighting: function() {
           // some timing issue here
-          this.async(function(){
-            var bytes = Polymer.dom(this.root).querySelectorAll('.hex');
+          this.async(function() {
+            // this is broken in polymer 1.1, i.e., bytes = [];
+            var bytes = Polymer.dom(this.$.table).querySelectorAll('.hex');
             bytes.forEach(function(byte) {
               byte.addEventListener('mouseenter', (function(e) {
                 this._highlightAscii(true, e)
@@ -362,14 +366,18 @@ Custom property | Description | Default
                 this._highlightAscii(false, e)
               }).bind(this));
             }, this);
-          },100);
+          }, 100);
+
         },
 
-        _tableChanged: function(table){
-          if (table){
+        _tableChanged: function(table) {
+          if (table) {
             this._initHighlighting();
           }
         },
+
+        attached: function(){
+        }
 
       });
     })();
