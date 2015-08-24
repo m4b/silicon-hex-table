@@ -34,61 +34,61 @@ Custom property | Description | Default
 @demo
 -->
 <dom-module id="silicon-hex-table">
-<style>
-  :host {
-    display: block;
-    --highlight-color: #f0f3a9;
-    --ascii-color: blue;
-    --hex-color: #333;
-    --column-padding: 4px;
-    --inner-column-padding: 2px;
-    --header-color: #ccc;
-    --background-color: #fafafa;
-    --offset-color: #bd8d00;
-    --font-size: 16px;
-    font-size: var(--font-size);
-    font-family: 'Inconsolata', monospace;
-  }
-
-  #table {
-    display: inline-block;
-    background: var(--background-color);
-    color: var(--hex-color);
-    border: 0px;
-    border-collapse: collapse;
-    border-spacing: 0px 0px;
-  }
-
-  td,
-  th {
-    border: 0px;
-    margin: 0px;
-    padding-right: var(--column-padding);
-    font-weight: normal;
-  }
-
-  .header {
-    background: var(--header-color);
-  }
-
-  .hex,
-  .hexheader {
-    padding: 0 var(--inner-column-padding);
-  }
-
-  .ascii {
-    color: var(--ascii-color);
-  }
-
-  .highlighted {
-    background-color: var(--highlight-color);
-  }
-
-  .offsets {
-    color: var(--offset-color);
-  }
-  </style>
   <template>
+    <style>
+     :host {
+       display: block;
+       --highlight-color: #f0f3a9;
+       --ascii-color: blue;
+       --hex-color: #333;
+       --column-padding: 4px;
+       --inner-column-padding: 2px;
+       --header-color: #ccc;
+       --background-color: #fafafa;
+       --offset-color: #bd8d00;
+       --font-size: 16px;
+       font-size: var(--font-size);
+       font-family: 'Inconsolata', monospace;
+     }
+
+     #table {
+       display: inline-block;
+       background: var(--background-color);
+       color: var(--hex-color);
+       border: 0px;
+       border-collapse: collapse;
+       border-spacing: 0px 0px;
+     }
+
+     td,
+     th {
+       border: 0px;
+       margin: 0px;
+       padding-right: var(--column-padding);
+       font-weight: normal;
+     }
+
+     .header {
+       background: var(--header-color);
+     }
+
+     .hex,
+     .hexheader {
+       padding: 0 var(--inner-column-padding);
+     }
+
+     .ascii {
+       color: var(--ascii-color);
+     }
+
+     .highlighted {
+       background-color: var(--highlight-color);
+     }
+
+     .offsets {
+       color: var(--offset-color);
+     }
+    </style>
     <table id="table">
       <tr class="header">
         <th>

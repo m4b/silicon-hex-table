@@ -1,6 +1,6 @@
 {
   "name": "silicon-hex-table",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "authors": [
     "m4b <m4b.github.io@gmail.com>"
   ],
@@ -24,7 +24,7 @@
     "/demo/"
   ],
   "dependencies": {
-    "polymer": "Polymer/polymer#~1.0.6"
+    "polymer": "Polymer/polymer#>=1.1.1"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
