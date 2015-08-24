@@ -3,7 +3,9 @@
 <!--
 An efficient hex table for all your online hexadecimal needs.
 
-Specify an `offset` into `bytes`, and the table will automatically populate the offset, hexadecimal, and ASCII tables with what it finds (or '--' if it goes beyond the length of `bytes`).
+Specify an `offset` into `bytes`, and the table will automatically populate
+the offset, hexadecimal, and ASCII tables with what it finds
+ (or '--' if it goes beyond the length of `bytes`).
 
 Example:
 
@@ -11,11 +13,24 @@ Example:
     <silicon-hex-table offset="0x0" bytes="[[uint8array]]"></silicon-hex-table>
 
 
-Please **NOTE** the `bytes` must be a `Uint8Array` for now; in the future, a base64 encoded string will also be accepted.
+Please **NOTE** the `bytes` must be a `Uint8Array` for now;
+in the future, a base64 encoded string will also be accepted.
 
-If you data-bind to `offset` and modify it, the table automatically adjusts itself, and displays the values (if any) after that offset.  Negative offsets are accepted, but that's crazy and means nothing, so don't rely on that behavior.
+If you data-bind to `offset` and modify it, the table automatically adjusts itself,
+and displays the values (if any) after that offset.
+Negative offsets are accepted, but that's crazy and means nothing,
+so don't rely on that behavior.
 
-If you want a smaller or larger table, change the `rows` property to the desired value, and the table will automatically adjust itself.  More rows means more updates, so be careful.
+If you want a smaller or larger table, change the `rows` property to the
+desired value, and the table will automatically adjust itself.
+More rows means more updates, so be careful.
+
+Unless you specify `no-select` or set `noSelect = true`,
+dragging/selecting across the hex table will select that portion of bytes.
+
+To programmatically initiate this, call `selectRange(start, count)`,
+where start is the `offset` to start selecting at, and `count`
+is the amount.
 
 ### Styling
 
@@ -24,6 +39,7 @@ The table is themeable via the following CSS custom properties.
 Custom property | Description | Default
 :---------------|:------------|:-------|
 `--highlight-color`| Mouse highlight color | `#f0f3a9`
+`--selected-color`| Selected bytes highlight color | `#f0f0a0`
 `--ascii-color` | Color of the ASCII table characters | `blue`
 `--hex-color` | Color of the hexadecimal bytes |`#333`
 `--header-color` | Color of the table header | `#ccc`
@@ -36,88 +52,132 @@ Custom property | Description | Default
 <dom-module id="silicon-hex-table">
   <template>
     <style>
-     :host {
-       display: block;
-       --highlight-color: #f0f3a9;
-       --ascii-color: blue;
-       --hex-color: #333;
-       --column-padding: 4px;
-       --inner-column-padding: 2px;
-       --header-color: #ccc;
-       --background-color: #fafafa;
-       --offset-color: #bd8d00;
-       --font-size: 16px;
-       font-size: var(--font-size);
-       font-family: 'Inconsolata', monospace;
-     }
+      :host {
+        display: block;
+        --highlight-color: #f0f3a9;
+        --selected-color: #f0f0a0;
+        --ascii-color: blue;
+        --hex-color: #333;
+        --column-padding: 0px;
+        --inner-column-padding: 0px;
+        --header-color: #ccc;
+        --background-color: #fafafa;
+        --offset-color: #bd8d00;
+        --font-size: 16px;
+        font-size: var(--font-size);
+        font-family: 'Inconsolata', monospace;
+      }
 
-     #table {
-       display: inline-block;
-       background: var(--background-color);
-       color: var(--hex-color);
-       border: 0px;
-       border-collapse: collapse;
-       border-spacing: 0px 0px;
-     }
+      div {
+        display: inline-block;
+        background: var(--header-color);
+      }
 
-     td,
-     th {
-       border: 0px;
-       margin: 0px;
-       padding-right: var(--column-padding);
-       font-weight: normal;
-     }
+      table {
+        display: inline-block;
+        background: var(--background-color);
+        color: var(--hex-color);
+        border: 0px;
+        border-collapse: collapse;
+        border-spacing: 0px 0px;
+        padding: 0px;
+      }
 
-     .header {
-       background: var(--header-color);
-     }
+      td,
+      th {
+        border: 0px;
+        margin: 0px;
+        padding-right: var(--column-padding);
+        font-weight: normal;
+      }
 
-     .hex,
-     .hexheader {
-       padding: 0 var(--inner-column-padding);
-     }
+      .header {
+        background: var(--header-color);
+      }
 
-     .ascii {
-       color: var(--ascii-color);
-     }
+      .asciiheader span {
+        color: var(--ascii-color);
+      }
 
-     .highlighted {
-       background-color: var(--highlight-color);
-     }
+      .selected {
+        background: var(--selected-color);
+      }
 
-     .offsets {
-       color: var(--offset-color);
-     }
+      .highlighted {
+        background-color: var(--highlight-color);
+      }
+
+      .offsets {
+        color: var(--offset-color);
+      }
+
+      ::selection {
+        background: #fff;
+        color: var(--text-color);
+        opacity: .25;
+      }
+
+      ::-moz-selection {
+        background: #fff;
+        color: var(--text-color);
+        opacity: .25;
+      }
     </style>
-    <table id="table">
-      <tr class="header">
-        <th>
-          <span>87654321</span>
-        </th>
-        <th>
-          <template is="dom-repeat" items="[[_header]]"><span class="hexheader">[[item]]</span></template>
-        </th>
-        <th>
-          <!-- because http://stackoverflow.com/questions/31846667/dom-repeat-with-span-whitespace-solution -->
-          <template is="dom-repeat" items="[[_asciiheader]]"><span>[[item]]</span></template>
-        </th>
-      </tr>
 
-      <template is="dom-repeat" items="[[_table]]" as="row">
-        <tr>
-          <td class="offsets">
-            <span>[[_getOffset(offset, index)]]</span>
-          </td>
-          <td class="bytes">
-            <template is="dom-repeat" items="[[_get(row)]]" as="col"><span id$="[[col.id]]" class="hex">[[_getHex(_bytes, offset, col)]]</span></template>
-          </td>
-          <td class="asciiheader">
-            <template is="dom-repeat" items="[[_get(row)]]" as="col"><span id$="[[col.hid]]" class="ascii">[[_getAscii(_bytes, offset, col)]]</span></template>
-          </td>
+    <div>
+
+      <table id="offsetTable">
+        <tr class="header">
+          <th>
+            <span>87654321</span>
+          </th>
         </tr>
-      </template>
+        <template is="dom-repeat" items="[[_table]]" as="row">
+          <tr>
+            <td class="offsets">
+              <span>[[_getOffset(offset, index)]]</span>
+            </td>
+          </tr>
+        </template>
+      </table>
 
-    </table>
+      <table id="hexTable">
+        <tr class="header">
+          <th>
+            <template is="dom-repeat" items="[[_header]]">
+              <span class="hexheader">[[item]]</span>
+            </template>
+          </th>
+        </tr>
+        <template is="dom-repeat" items="[[_table]]" as="row">
+          <tr>
+            <td class="bytes">
+              <template is="dom-repeat" items="[[_get(row)]]" as="col">
+                <span id$="[[col.id]]" class$="[[_computeSelected(_selectedSet, col.id)]]">[[_getHex(_bytes, offset, col)]]</span>
+              </template>
+            </td>
+          </tr>
+        </template>
+      </table>
+
+      <table id="asciiTable">
+        <tr class="header">
+          <th>
+            <!-- because http://stackoverflow.com/questions/31846667/dom-repeat-with-span-whitespace-solution -->
+            <template is="dom-repeat" items="[[_asciiheader]]"><span>[[item]]</span></template>
+          </th>
+        </tr>
+
+        <template is="dom-repeat" items="[[_table]]" as="row">
+          <tr>
+            <td class="asciiheader">
+              <template is="dom-repeat" items="[[_get(row)]]" as="col"><span id$="[[col.hid]]" class$="[[_computeSelected(_selectedSet, col.id)]]">[[_getAscii(_bytes, offset, col)]]</span></template>
+            </td>
+          </tr>
+        </template>
+      </table>
+
+    </div>
 
   </template>
   <script>
@@ -144,7 +204,8 @@ Custom property | Description | Default
               return {
                 row: 0,
                 col: 0,
-                offset: 0
+                offset: 0,
+                count: 0 // TODO: add count feature
               }
             }
           },
@@ -172,6 +233,35 @@ Custom property | Description | Default
           rows: {
             type: Number,
             value: 19
+          },
+          /**
+           * The selected offsets.  Bind to this to watch changes.
+           * @type {{begin: Number, end: Number, count: Number}}
+           */
+          selected: {
+            type: Array,
+            notify: true,
+            value: function() {
+              return {};
+            }
+          },
+          /**
+           * Do not perform selection via tracking drag gestures
+           * (you can still manually select with `selectRange`).
+           */
+          noSelect: {
+            type: Boolean,
+            value: false
+          },
+          /**
+           * The set of selected nodes.
+           * @type {Set}
+           */
+          _selectedSet: {
+            type: Object,
+            value: function() {
+              return new Set();
+            }
           },
           /**
            * The computed property for the bytes to display.
@@ -212,6 +302,132 @@ Custom property | Description | Default
             type: Array,
             computed: '_computeTable(rows)',
             observer: '_tableChanged'
+          }
+        },
+
+        listeners: {
+          'hexTable.track': '_trackSoHard',
+          'hexTable.tap': '_tap'
+        },
+
+        /**
+         * Selects a range of bytes (and thereby highlights them).
+         * Wipes the current selection, and sets `selected` to the new range.
+         *
+         * @param {Number} begin The offset to begin the selection
+         * @param {Number} count The number of bytes to select
+         */
+        selectRange: function(begin, count) {
+          var set = new Set();
+          for (var i = 0; i < count; i++) {
+            var id = this._offset2id(begin + i);
+            set.add(id);
+          }
+          this._selectedSet = set;
+          this.selected = {
+            begin: begin,
+            end: begin + count,
+            count: count
+          };
+        },
+
+        /**
+         * Deselects the selected bytes (removes highlighting).
+         */
+        deselect: function() {
+          this._selectedSet = new Set();
+          this.selected = {}; // or null?
+          this._selectStart = undefined;
+          this._selectCount = undefined;
+        },
+
+        /**
+         * Toggles the offset table's display state.
+         */
+        toggleOffsetTable: function() {
+          var hidden = this.$.offsetTable.style.display === 'none';
+          this.$.offsetTable.style.display = hidden ? 'inline-block' : 'none';
+        },
+
+        /**
+         * Toggles the hex table's display state.
+         */
+        toggleHexTable: function() {
+          var hidden = this.$.hexTable.style.display === 'none';
+          this.$.hexTable.style.display = hidden ? 'inline-block' : 'none';
+        },
+
+        /**
+         * Toggles the ascii table's display state.
+         */
+        toggleAsciiTable: function() {
+          var hidden = this.$.asciiTable.style.display === 'none';
+          this.$.asciiTable.style.display = hidden ? 'inline-block' : 'none';
+        },
+
+        /**
+         * Computed property for setting the selected class state of the hexadecimal
+         * and ascii bytes.
+         * @param {Set} selectedSet The set of selected ids
+         * @param {String} id The id to check if it's in the selected ids set
+         */
+        _computeSelected: function(selectedSet, id) {
+          return selectedSet.has(id) ? 'selected' : '';
+        },
+
+        /**
+         * Selects the target node if it's a valid node, has an id, and sets the appropriate
+         * internal values `_selectStart` and `_selectCount` for use in `selectRange()`.
+         * **TODO**: implement backwards dragging.
+         *
+         * @param {Node} target The target node to add or not.
+         */
+        _selectTarget: function(target) {
+          if (target && target.id) {
+            if (this._selectStart === undefined) {
+              this._selectStart = this._id2offset(target.id);
+            } else {
+              var end = this._id2offset(target.id);
+              if (this._selectStart > end) { // TODO: if backwards
+                  var tmp = this._selectStart;
+                  this._selectStart = end;
+                  end = tmp;
+                  this._backwards = true;
+              }
+              this._selectCount = end - this._selectStart + 1; // because need to include last byte
+            }
+          }
+        },
+
+        _tap: function(e) {
+          if (!this.noSelect) {
+            this.deselect();
+          }
+        },
+
+        /**
+         * The gesture tracker for Polymer `track` events.  Tracks _real_ hard.
+         */
+        _trackSoHard: function(e) {
+          if (!this.noSelect) {
+            switch (e.detail.state) {
+              case 'start':
+                this.deselect();
+                var target = e.detail.hover();
+                this._selectTarget(target);
+                break;
+              case 'end':
+                var target = e.detail.hover();
+                this._selectTarget(target);
+                this.selectRange(this._selectStart, this._selectCount);
+                break;
+              case 'track':
+                var target = e.detail.hover();
+                this._selectTarget(target);
+                break;
+              default:
+                break;
+            }
           }
         },
 
@@ -256,6 +472,33 @@ Custom property | Description | Default
             pad += '0';
           }
           return pad + offsetstr;
+        },
+
+        _id2raster: function(id) {
+          var split = id.slice(1).split('c');
+          var r = parseInt(split[0]);
+          var c = parseInt(split[1]);
+          return {
+            r: r,
+            c: c
+          };
+        },
+
+        /**
+         * Takes a target's id in the byte table and returns its hex value.
+         * @param {String} id The id of the target
+         * @return {Number} The offset of the byte
+         */
+        _id2offset: function(id) {
+          var raster = this._id2raster(id);
+          return this._raster2index(this.offset, raster.r, raster.c);
+        },
+
+        _offset2id: function(offset) {
+          var base = offset - this.offset;
+          var r = Math.floor(base / this.rows);
+          var c = base % this.columns;
+          return 'r' + r + 'c' + c;
         },
 
         /*
@@ -359,8 +602,7 @@ Custom property | Description | Default
         _initHighlighting: function() {
           // some timing issue here
           this.async(function() {
-            // this is broken in polymer 1.1, i.e., bytes = [];
-            var bytes = Polymer.dom(this.$.table).querySelectorAll('.hex');
+            var bytes = Polymer.dom(this.$.hexTable).querySelectorAll('.bytes span');
             bytes.forEach(function(byte) {
               byte.addEventListener('mouseenter', (function(e) {
                 this._highlightAscii(true, e)
@@ -379,8 +621,7 @@ Custom property | Description | Default
           }
         },
 
-        attached: function(){
-        }
+        attached: function() {}
 
       });
     })();
