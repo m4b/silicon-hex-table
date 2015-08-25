@@ -504,7 +504,7 @@ Custom property | Description | Default
 
         _offset2id: function(offset) {
           var base = offset - this.offset;
-          var r = Math.floor(base / this.rows);
+          var r = Math.floor(base / this.columns);
           var c = base % this.columns;
           return 'r' + r + 'c' + c;
         },
