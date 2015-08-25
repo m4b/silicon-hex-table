@@ -1,0 +1,33 @@
+{
+  "name": "silicon-hex-table",
+  "version": "1.2.1",
+  "authors": [
+    "m4b <m4b.github.io@gmail.com>"
+  ],
+  "description": "A hexadecimal table",
+    "keywords": [
+        "hexadecimal",
+        "hex",
+        "binary",
+        "byte",
+        "bytes",
+        "web-component",
+        "web-components",
+        "polymer"
+    ],
+  "main": "silicon-hex-table.html",
+  "license": "LICENSE",
+  "homepage": "https://github.com/m4b/silicon-hex-table/",
+  "ignore": [
+    "/.*",
+    "/test/",
+    "/demo/"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#>=1.1.1"
+  },
+  "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
+    "web-component-tester": "*"
+  }
+}
