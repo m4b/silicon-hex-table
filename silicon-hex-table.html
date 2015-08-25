@@ -441,6 +441,14 @@ Custom property | Description | Default
          */
 
         /**
+         * The `selected-changed` event is fired whenever `selected` is
+         * changed via dragging or through `selectRange()`, etc..
+         *
+         * {{begin: Number, end: Number, count: Number}}
+         * @event selected-changed
+         */
+
+        /**
          * Computed function for `_bytes`; currently just checks if `bytes` attribute is a Uint8Array, and if not, educates the user and returns an empty `Uint8Array`.
          * @param {Uint8Array} bytes The bytes to view
          * @return {Uint8Array} The actual internal representation we use
